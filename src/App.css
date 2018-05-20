@@ -1,5 +1,12 @@
+html {
+  height: 100%;
+}
+body {
+  min-height: 100%;
+}
+
 .App {
-  text-align: center;
+  /* text-align: center; */
 }
 
 .App-logo {
@@ -25,4 +32,16 @@
 @keyframes App-logo-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+.title-header{
+  position: fixed;
+}
+main{
+  padding: 70px 40px 40px 40px;
+}
+
+
+.table tr{
+  cursor: pointer;
 }

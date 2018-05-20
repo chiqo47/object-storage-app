@@ -1,21 +1,57 @@
 import React, { Component } from 'react'
-import logo from './logo.svg'
 import './App.css'
 
-import { BrowserRouter as Router, Route, Link } from "react-router-dom"
+import  { BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom'
+
+import {
+  Button,
+  Navbar,
+  NavbarBrand
+} from 'reactstrap'
+
+import BucketList from './components/BucketList'
+import NewBucket from './components/NewBucket'
+import Bucket from './components/Bucket'
 
 class App extends Component {
   render() {
     return (
       <Router>
         <div className="App">
-          <header className="App-header">
-            <img src={logo} className="App-logo" alt="logo" />
-            <h1 className="App-title">Welcome to React</h1>
-          </header>
-          <p className="App-intro">
-            To get started, edit <code>src/App.js</code> and save to reload.
-          </p>
+
+          <Navbar className="fixed-top" color="light" light expand="md">
+            <NavbarBrand href="/">Secure cloud storage</NavbarBrand>
+          </Navbar>
+
+          <main role="main">
+
+            <Switch>
+              <Route exact path="/" render={props =>
+                <span>
+                  <h3>Bucket List</h3>
+                  <BucketList {...props}></BucketList>
+                </span>
+              }/>
+              <Route path="/buckets/create" render={props =>
+                <span>
+                  <h3>Bucket List</h3>
+                  <p>Create New Bucket</p>
+                  <NewBucket {...props}></NewBucket>
+                  <BucketList {...props} hideCreateButton={true}></BucketList>
+                </span>
+              }/>
+
+              <Route path="/buckets/:bucket" component={Bucket} />
+
+
+              <Route render={() => <h3>404</h3>}/>
+            </Switch>
+
+
+
+          </main>
+
+
         </div>
       </Router>
     )

@@ -1,0 +1,12 @@
+.new-bucket{
+  padding: 20px;
+  margin: 0;
+  border: 1px solid #e1e1e1;
+}
+
+form.new-bucket {
+  padding: 10px;
+  margin: 0;
+  border: 1px solid #e1e1e1;
+  margin-bottom: 20px;
+}

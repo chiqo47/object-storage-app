@@ -1,0 +1,9 @@
+.bucket-list{
+  padding: 0px;
+  margin: 0;
+  border: 1px solid #e1e1e1;
+}
+
+.bucket-list table{
+  margin: 0 10px 10px 10px;
+}
