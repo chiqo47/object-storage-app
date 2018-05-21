@@ -137,7 +137,7 @@ export function fetchDeleteBucket(bucketId, file) {
     // console.log("bucketsApi.uploadObject")
     return bucketsApi.delete(bucketId)
       .then(data => {
-        dispatch(deleteBucketDone())
+        // dispatch(deleteBucketDone())
         // dispatch(fetchBucketObjects(bucketId))
       })
   }

@@ -6,7 +6,7 @@ import {bytesToSize} from '../../helpers'
 
 import {connect} from 'react-redux'
 
-import  { BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
+import  { BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom'
 import {fetchBucketObjects, fetchUploadObject, fetchDeleteBucket} from '../../actions'
 
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col, Table, Container} from 'reactstrap'
@@ -66,11 +66,8 @@ export class Bucket extends React.Component {
 
     let {routeBucketId, bucket, bucketObjects} = this.props
 
-
-    console.log(bucket)
-
     if(!bucket)
-      return <Redirect></Redirect>
+      return null
 
     let bucketId = bucket.id
     let objects = bucketObjects[bucketId]
@@ -184,7 +181,7 @@ export class Bucket extends React.Component {
   }
 }
 
-function mapStateToProps(state, props) {
+function mapStateToProps(state = {}, props) {
   console.log(state)
   let routeBucketId = props.match.params.bucket
   let bucket = state.buckets.find(bucket => bucket.id == routeBucketId)

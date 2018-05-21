@@ -1,7 +1,9 @@
 
 ## Available Scripts
 
-In the project directory, you can run:
+### Run `npm install` to install the app.
+
+Then, in the project directory, you can run:
 
 ### `npm start`
 
