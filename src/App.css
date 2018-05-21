@@ -41,7 +41,10 @@ main{
   padding: 70px 40px 40px 40px;
 }
 
-
 .table tr{
+  cursor: pointer;
+}
+
+.nav.nav-tabs .nav-item{
   cursor: pointer;
 }

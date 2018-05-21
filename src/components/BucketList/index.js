@@ -1,7 +1,9 @@
 import React, {Component} from 'react'
 import './bucket-list.css'
 
-import {BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom'
+import {connect} from 'react-redux'
+
+import {BrowserRouter as Router, Route, Link, Switch, withRouter} from 'react-router-dom'
 
 import {
   Table,
@@ -17,19 +19,25 @@ import {
   Nav,
   DropdownToggle,
   DropdownMenu,
-  DropdownItem
+  DropdownItemc
 } from 'reactstrap'
 
 // const BucketList = () => <span>
 //   <h3>BucketList</h3>
 // </span>
 
-const BucketList = ({hideCreateButton}) => {
+const renderBucketRow = (bucket, history) =>
+  <tr key={bucket.id} onClick={() => history.push('/buckets/' + bucket.id)}>
+    <td>{bucket.name}</td>
+    <td>{bucket.location.name}</td>
+  </tr>
 
+
+export const BucketList = ({hideCreateButton, buckets, history}) => {
   return <dir className="bucket-list">
 
     <Navbar color="light" light={true} expand="md">
-      <NavbarBrand href="/">All buckets (3)</NavbarBrand>
+      <NavbarBrand>All buckets (3)</NavbarBrand>
 
       { !hideCreateButton &&
         <Collapse isOpen={true} navbar>
@@ -52,21 +60,19 @@ const BucketList = ({hideCreateButton}) => {
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td>Mark</td>
-          <td>Otto</td>
-        </tr>
-        <tr>
-          <td>Jacob</td>
-          <td>Thornton</td>
-        </tr>
-        <tr>
-          <td>Larry</td>
-          <td>the Bird</td>
-        </tr>
+        {
+          buckets.map(b => renderBucketRow(b, history))
+        }
+
       </tbody>
     </Table>
   </dir>
 }
 
-export default BucketList
+function mapStateToProps(state) {
+  return {
+    buckets: state.buckets || []
+  }
+}
+
+export default withRouter(connect(mapStateToProps)(BucketList))

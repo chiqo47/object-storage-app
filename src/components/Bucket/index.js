@@ -1,21 +1,46 @@
 import React, { Component } from 'react'
 import './bucket.css'
 import classnames from 'classnames'
+import moment from 'moment'
+import {bytesToSize} from '../../helpers'
 
-import  { BrowserRouter as Router, Route, Link, Switch} from 'react-router-dom'
+import {connect} from 'react-redux'
+
+import  { BrowserRouter as Router, Route, Link, Switch, Redirect} from 'react-router-dom'
+import {fetchBucketObjects, fetchUploadObject, fetchDeleteBucket} from '../../actions'
 
 import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col, Table, Container} from 'reactstrap'
 import {
   Collapse, Navbar, NavbarBrand
 } from 'reactstrap'
-export default class Example extends React.Component {
+
+const renderObjectListItem = ({id, name, last_modified, size}) => {
+  console.log(name, last_modified, size)
+  var momObj = moment(last_modified)
+  var timeToString = momObj.format('DD.MM.YYYY')
+
+  return <tr key={name}>
+    <th>{name}</th>
+    <th>{timeToString}</th>
+    <th>{bytesToSize(size || 0, 0)}</th>
+  </tr>
+}
+
+export class Bucket extends React.Component {
   constructor(props) {
     super(props)
 
-    this.toggle = this.toggle.bind(this);
+    // console.log(props)
+
+    this.toggle = this.toggle.bind(this)
     this.state = {
-      activeTab: '2'
+      activeTab: '1'
     }
+
+    let {routeBucketId, bucket, dispatch} = this.props
+
+    if (routeBucketId)
+      dispatch(fetchBucketObjects(routeBucketId))
   }
 
   toggle(tab) {
@@ -26,9 +51,41 @@ export default class Example extends React.Component {
     }
   }
 
+  handleFileUpload(e) {
+    let file = e.target.files[0]
+
+    let {bucket, dispatch} = this.props
+
+    if (file){
+      let bucketId = bucket.id
+      dispatch(fetchUploadObject(bucketId, file))
+    }
+  }
+
   render() {
+
+    let {routeBucketId, bucket, bucketObjects} = this.props
+
+
+    console.log(bucket)
+
+    if(!bucket)
+      return <Redirect></Redirect>
+
+    let bucketId = bucket.id
+    let objects = bucketObjects[bucketId]
+
+    if(!objects)
+      return null
+
+    let sizeInBytes = objects.reduce((acc, obj) => {
+      console.log(obj.size)
+      return acc + obj.size
+    }, 0)
+
     return (
       <div>
+        <h4>{bucket.name}</h4>
         <Nav tabs>
           <NavItem>
             <NavLink
@@ -50,7 +107,7 @@ export default class Example extends React.Component {
 
         <TabContent activeTab={this.state.activeTab}>
 
-          <Button className="delete-bucket-button" color="danger">Delete bucket</Button>
+          <Button className="delete-bucket-button" onClick={() => this.props.dispatch(fetchDeleteBucket(bucketId))} color="danger">Delete bucket</Button>
 
           <TabPane tabId="1">
             {/* <Row>
@@ -60,7 +117,7 @@ export default class Example extends React.Component {
             </Row> */}
 
             <Navbar color="light" light={true} expand="md">
-              <NavbarBrand>All files (3)</NavbarBrand>
+              <NavbarBrand>{`All files (${bucketObjects[bucketId].length})`}</NavbarBrand>
 
               <Collapse isOpen={true} navbar>
                 <Nav className="ml-auto" navbar>
@@ -72,7 +129,7 @@ export default class Example extends React.Component {
                   {" "}
                   <NavItem>
                     {/* <Link to="/buckets/create"> */}
-                      <Button color="primary">Upload Object</Button>
+                      <Button color="primary" onClick={() => this.fileInput.click()}>Upload Object</Button>
                     {/* </Link> */}
                   </NavItem>
                 </Nav>
@@ -89,51 +146,53 @@ export default class Example extends React.Component {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>asdf</td>
-                </tr>
+                {
+                  objects && objects.map(renderObjectListItem)
+                }
               </tbody>
             </Table>
 
+            <form>
+              <input hidden
+                ref={input => this.fileInput = input}
+                type="file"
+                onChange={e => this.handleFileUpload(e)}
+              />
+            </form>
 
           </TabPane>
 
           <TabPane tabId="2">
             <Container>
               <Row>
-                <Col className="text-right" xs="2">Bucket name:</Col>
-                <Col xs="auto">Cool name</Col>
+                <Col className="text-right" xs="3">Bucket name:</Col>
+                <Col xs="auto">{bucket.name}</Col>
               </Row>
               <Row>
-                <Col className="text-right" xs="2">Location:</Col>
-                <Col xs="auto">Šoštanj</Col>
+                <Col className="text-right" xs="3">Location:</Col>
+                <Col xs="auto">{bucket.location.name}</Col>
               </Row>
               <Row>
-                <Col className="text-right" xs="2">Storage size:</Col>
-                <Col xs="auto">33.5GB</Col>
+                <Col className="text-right" xs="3">Storage size:</Col>
+                <Col xs="auto">{bytesToSize(sizeInBytes || 0)}</Col>
               </Row>
             </Container>
-            {/* <Row>
-              <Col sm="6">
-                <Card body>
-                  <CardTitle>Special Title Treatment</CardTitle>
-                  <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
-                  <Button>Go somewhere</Button>
-                </Card>
-              </Col>
-              <Col sm="6">
-                <Card body>
-                  <CardTitle>Special Title Treatment</CardTitle>
-                  <CardText>With supporting text below as a natural lead-in to additional content.</CardText>
-                  <Button>Go somewhere</Button>
-                </Card>
-              </Col>
-            </Row> */}
           </TabPane>
         </TabContent>
       </div>
     )
   }
 }
+
+function mapStateToProps(state, props) {
+  console.log(state)
+  let routeBucketId = props.match.params.bucket
+  let bucket = state.buckets.find(bucket => bucket.id == routeBucketId)
+  return {
+    routeBucketId,
+    bucket,
+    bucketObjects: state.bucketObjects
+  }
+}
+
+export default connect(mapStateToProps)(Bucket)
